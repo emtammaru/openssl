@@ -519,6 +519,9 @@ func LoadCertificatesFromPKCS7(der_block []byte) (*PKCS7, error) {
 // loadCertificateStack loads up a stack of x509 certificates into the PKCS7 struct.
 func (p *PKCS7) loadCertificateStack(sk *C.struct_stack_st_X509) error {
 	sk_num := int(C.X_sk_X509_num(sk))
+	if sk_num < 0 {
+		return fmt.Errorf("invalid value returned by sk_X509_num: %d", sk_num)
+	}
 	p.Certs = make([]*Certificate, 0, sk_num)
 	for i := 0; i < sk_num; i++ {
 		x := C.X_sk_X509_value(sk, C.int(i))
